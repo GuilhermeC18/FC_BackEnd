@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Movie {
+  id          Int           @id @default(autoincrement())
+  movieTitle  String
+  Transaction Transaction[]
+}
+
+model Transaction {
+  id                     Int                  @id @default(autoincrement())
+  date                   DateTime
+  amountCurrency         String
+  territory              Territory            @relation(fields: [territoryId], references: [id])
+  amountValue            Int
+  collectionSource       CollectionSource     @relation(fields: [collectionSourceId], references: [id])
+  collectionSourceType   CollectionSourceType @relation(fields: [collectionSourceTypeId], references: [id])
+  movie                  Movie                @relation(fields: [movieId], references: [id])
+  territoryId            Int
+  collectionSourceId     Int
+  collectionSourceTypeId Int
+  movieId                Int
+}
+
+model Territory {
+  id          Int           @id @default(autoincrement())
+  name        String
+  Transaction Transaction[]
+}
+
+model CollectionSource {
+  id          Int           @id @default(autoincrement())
+  name        String
+  Transaction Transaction[]
+}
+
+model CollectionSourceType {
+  id          Int           @id @default(autoincrement())
+  name        String
+  Transaction Transaction[]
+}
+
+generator client {
+  provider = "prisma-client-js"
+}

@@ -1,0 +1,24 @@
+{
+  "name": "filmchain-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon -e js graphql src/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@apollo/client": "^3.3.7",
+    "@graphql-tools/schema": "^7.1.2",
+    "@prisma/client": "^2.15.0",
+    "dotenv": "^8.2.0",
+    "graphql-yoga": "^1.18.3",
+    "nodemon": "^2.0.7"
+  },
+  "devDependencies": {
+    "@prisma/cli": "^2.15.0"
+  }
+}
