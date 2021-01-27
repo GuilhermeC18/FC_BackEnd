@@ -13,36 +13,15 @@ model Movie {
 }
 
 model Transaction {
-  id                     Int                  @id @default(autoincrement())
-  date                   DateTime
-  amountCurrency         String
-  territory              Territory            @relation(fields: [territoryId], references: [id])
-  amountValue            Int
-  collectionSource       CollectionSource     @relation(fields: [collectionSourceId], references: [id])
-  collectionSourceType   CollectionSourceType @relation(fields: [collectionSourceTypeId], references: [id])
-  movie                  Movie                @relation(fields: [movieId], references: [id])
-  territoryId            Int
-  collectionSourceId     Int
-  collectionSourceTypeId Int
-  movieId                Int
-}
-
-model Territory {
-  id          Int           @id @default(autoincrement())
-  name        String
-  Transaction Transaction[]
-}
-
-model CollectionSource {
-  id          Int           @id @default(autoincrement())
-  name        String
-  Transaction Transaction[]
-}
-
-model CollectionSourceType {
-  id          Int           @id @default(autoincrement())
-  name        String
-  Transaction Transaction[]
+  id                   Int      @id @default(autoincrement())
+  date                 DateTime
+  amountCurrency       String
+  territory            String
+  amountValue          Int
+  collectionSource     String
+  collectionSourceType String
+  movie                Movie    @relation(fields: [movieId], references: [id])
+  movieId              Int
 }
 
 generator client {
