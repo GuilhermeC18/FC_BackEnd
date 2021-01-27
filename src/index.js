@@ -15,33 +15,15 @@ const typeDefs = `
     id  :ID! 
     date  : String!
     amountCurrency: String! 
-    territory     :Territory 
+    territory     :String! 
     amountValue  :Int!
-    collectionSource :CollectionSource
-    collectionSourceType :CollectionSourceType
+    collectionSource :String!
+    collectionSourceType :String!
     movie  :Movie!
-  }
-  type Territory {
-    id  :ID!
-    name :String!
-    Transactions: [Transaction]
-  }
-  type CollectionSource {
-    id  :ID!
-    name :String!
-    Transactions: [Transaction]
-  }
-  type CollectionSourceType {
-    id  :ID!
-    name :String!
-    Transactions: [Transaction]
   }
   type Query {
     
     movie(id: ID!): Movie
-    territory(id: ID!): Territory
-    collectionSource(id: ID!): CollectionSource
-    collectionSourceType(id: ID!): CollectionSourceType
     transactions: [Transaction]
   }
   type Mutation {
@@ -49,32 +31,23 @@ const typeDefs = `
       movieTitle: String!
     ) : Movie
     addTransaction(
-      id: ID!
       date: String!
-      movieId: ID! 
-      territoryId: ID! 
-      collectionSourceId: ID!
-      collectionSourceTypeId: ID! 
+      amountCurrency: String!
+      territory :String!
+      amountValue : Int!
+      collectionSource :String! 
+      collectionSourceType :String!
+      id: ID!
     ): Transaction
-    addTerritory(
-      name: String!
-    ): Territory 
-    addCollectionSource(
-      name: String! 
-    ): CollectionSource
-    addCollectionSourceType(
-      name: String!
-    ): CollectionSourceType 
   }
 `;
 //find a movie / add a movie 
-//find all transactions from a movie 
-//find all transactions from a movie and from a territory 
-//find all transactions from a movie and from a source
-//find all transactions from a movie and from a sourceType 
+//add transactions / find all transactions from a movie 
+
 const resolvers = {
   Query: {
     movie: async (parent, args, context) =>{  
+      console.log("query", context.prisma);
       return context.prisma.movie.findUnique({
         where: {
           id: parseInt(args.id)
@@ -82,6 +55,13 @@ const resolvers = {
         include: { Transaction: true}
       })
     },
+    transactions: async (parent, args, context) => {
+      return context.prisma.transaction.findMany({
+        include: {
+          movie: true
+        }
+      })
+    }
   },
   Mutation: {
     addMovie: (parent, args, context, info) => {
@@ -91,11 +71,26 @@ const resolvers = {
         },
       })
       return newMovie
+    }, 
+    addTransaction: (parent, args, context, info) => {
+       console.log(args);
+       const newTransaction = context.prisma.transaction.create({
+        data: {
+          date: args.date,
+          amountCurrency: args.amountCurrency,
+          territory: args.territory,
+          amountValue: parseInt(args.amountValue),
+          collectionSource: args.collectionSource,
+          collectionSourceType: args.collectionSourceType,
+          movie: {
+            connect: { id: parseInt(args.id) }
+          },
+        }
+      })
+      return newTransaction;
     },
-  }, 
-  
+  }
 }
-
 const schema = makeExecutableSchema({
   typeDefs,
   resolvers,
@@ -120,3 +115,66 @@ server.start(options, ({ port }) =>
     `Server started, listening on port ${port} for incoming requests.`,
   ),
 )
+
+
+//Add a transaction example: 
+/*
+mutation {
+  addTransaction(
+      date: "2017-07-16T19:20:30.451Z"
+      amountCurrency:"EUR"
+      territory:"Germany"
+      amountValue: 100000
+      collectionSource:"Warner Bros."
+      collectionSourceType:"Box Office"
+      id: "1"
+    ){
+      id
+      date
+      amountCurrency
+      territory
+      amountValue
+      collectionSource
+      collectionSourceType
+      
+    }
+  }
+*/
+
+//Get all transactions example: 
+/*
+query {
+  transactions {
+    date
+    amountCurrency
+    territory
+    amountValue
+    collectionSource
+    collectionSourceType
+    movie {
+      id
+      movieTitle
+    }
+  }
+} */
+
+//All transactions from one movie 
+/* 
+
+query {
+  movie (id: 1){
+    id
+    movieTitle
+    Transaction {
+      id
+      date
+      amountValue
+      territory
+      amountCurrency
+      collectionSource
+      collectionSourceType
+    }
+  }
+}
+
+*/
